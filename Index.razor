@@ -1,0 +1,45 @@
+﻿@page "/"
+@inject IRepositorio http;
+@using Microsoft.Extensions.Logging
+@using System.Text
+@using static System.Net.Mime.MediaTypeNames
+@inject ILogger<Index> Logger
+<PageTitle>Index</PageTitle>
+
+
+<EditForm Model="Data">
+<input @bind="Data.cadena"  />
+<textarea class="form-control form-control-sm" style="height:250px" @bind="@dato"></textarea>
+
+<InputFile OnChange="@LoadFiles" multiple></InputFile>
+<button type="submit" class="btn btn-primary"  @onclick="@prueba" >Guardar</button>
+<img src="@imageDataURL"/>
+</EditForm>
+
+
+@code{
+
+    private TextoDto Data = new();
+    private string? dato;
+    private string? imageDataURL;
+    //private byte[]? ImgByte;
+    private string? ImgB64;
+
+    private async Task prueba()
+    {
+
+
+
+        var result = await http.Post<QR,string>($"https://localhost:7291/api/Accesos/QRwithLogo?texto={Data.cadena}", new QR { imagenB64 = ImgB64 });
+        
+
+
+    }
+    private async void LoadFiles (InputFileChangeEventArgs file)
+    {
+        ImgUtil Consulta = new();
+        ImgB64 = await Consulta.ConvertToImage(file.File.OpenReadStream());
+    }
+
+ 
+}
